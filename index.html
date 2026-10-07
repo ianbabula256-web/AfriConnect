@@ -1,0 +1,286 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><script>try{var p=localStorage.getItem("wx-theme")||"system";document.documentElement.dataset.theme=p=="dark"||(p=="system"&&matchMedia("(prefers-color-scheme:dark)").matches)?"dark":"light"}catch(e){}</script>
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Airport Weather Analytics</title>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#102A43"><meta name="color-scheme" content="light dark"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="WxAnalytics">
+<style>
+:root{color-scheme:light;--bg:#F3F7FA;--card:#FFFFFF;--ink:#102A43;--mut:#486581;--line:#D5DFE8;--acc:#0B6FA4;--onacc:#FFFFFF;--warn:#7C3A06;--warnbg:#FEF3C7;--warnln:#B45309;--err:#9B1C12;--errbg:#FEE4E2;--okc:#0F5132;--okbg:#DCFCE7;--c1:#0B6FA4;--c2:#0F766E;--c3:#B45309;--c4:#6D4AC2;--b1:#BAD9F0;--b2:#7DB8E0;--b3:#3C8DC4;--b4:#1A5F96;--b5:#0D3560;--hbg:#102A43;--hfg:#FFFFFF;--cloud:#B9CEDD}
+[data-theme=dark]{color-scheme:dark;--bg:#0B1724;--card:#13263A;--ink:#EAF2F8;--mut:#A9BCCD;--line:#2A4560;--acc:#6CC4F5;--onacc:#0B1724;--warn:#FCD34D;--warnbg:#3A2E0B;--warnln:#FBBF24;--err:#FDA29B;--errbg:#3D1612;--okc:#86EFAC;--okbg:#10301F;--c1:#6CC4F5;--c2:#5EEAD4;--c3:#FBBF24;--c4:#C4B5FD;--b1:#3D5F80;--b2:#5B93C4;--b3:#7DBBEA;--b4:#B3DCF8;--b5:#EAF6FF;--hbg:#0F2034;--hfg:#EAF2F8;--cloud:#1E3850}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-variant-numeric:tabular-nums}
+body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}header,nav,main{position:relative;z-index:1}
+.sky{position:fixed;inset:0;overflow:hidden;z-index:0;pointer-events:none}.sky svg{position:absolute;width:260px;fill:var(--cloud);opacity:.55;animation:drift 160s linear infinite}.sky svg:nth-child(1){top:14%;left:-300px}.sky svg:nth-child(2){top:46%;left:-300px;width:360px;animation-duration:230s;animation-delay:-90s}.sky svg:nth-child(3){top:76%;left:-300px;width:200px;animation-duration:190s;animation-delay:-40s}
+@keyframes drift{to{transform:translateX(calc(100vw + 700px))}}@keyframes draw{to{stroke-dashoffset:0}}@keyframes fade{from{opacity:0}to{opacity:1}}@keyframes spin{to{transform:rotate(360deg)}}
+header{background:var(--hbg);color:var(--hfg);padding:12px 16px;display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:12px}.wm{font-weight:700;letter-spacing:.28em;font-size:17px}.wm.big{font-size:26px}header small{opacity:.85;font-size:12px}.mark{width:40px;height:40px;flex:none}.mark *{stroke:var(--hfg);fill:none;stroke-width:2.2;stroke-linecap:round}.hero .mark *{stroke:var(--acc)}.mark .fl{fill:var(--hfg);stroke:none}.hero .mark .fl{fill:var(--acc)}.hero .mark{width:84px;height:84px}
+.anim .d{stroke-dasharray:140;stroke-dashoffset:140;animation:draw 1.6s ease-out forwards}.anim .d2{animation-delay:.5s}.anim .fl,.anim .rw{opacity:0;animation:fade 1s ease 1.1s forwards}
+.th{display:flex;flex-direction:row;align-items:center;gap:6px;color:var(--hfg);font-size:12px}.th select{min-height:36px;background:transparent;color:var(--hfg);border:1px solid var(--hfg);padding:2px 6px}.th option{color:#102A43}
+nav{display:flex;gap:4px;overflow-x:auto;background:var(--card);border-bottom:1px solid var(--line);padding:0 8px;position:sticky;top:0;z-index:5}
+nav button{border:0;background:none;color:var(--mut);padding:12px;min-height:44px;white-space:nowrap;cursor:pointer;border-bottom:3px solid transparent;font:inherit}nav button[aria-selected=true]{color:var(--acc);border-color:var(--acc);font-weight:700}
+main{max-width:1200px;margin:0 auto;padding:12px}.bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:12px}
+label{display:flex;flex-direction:column;font-size:12px;color:var(--mut);gap:2px}
+select,input,button.b{min-height:44px;font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);max-width:100%}
+button.b{background:var(--acc);color:var(--onacc);border:0;cursor:pointer;padding:6px 14px;font-weight:600}button.b.s{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+:focus-visible{outline:3px solid var(--warnln);outline-offset:2px}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))}.cards{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));margin-bottom:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;min-width:0}.card h3{margin:0 0 6px;font-size:15px}
+.k{font-size:12px;color:var(--mut)}.v{font-size:24px;font-weight:700}.sub,.meta{font-size:12px;color:var(--mut)}.meta{border-top:1px solid var(--line);margin-top:8px;padding-top:6px}
+.note{background:var(--warnbg);color:var(--warn);border-left:4px solid var(--warnln);padding:8px 10px;border-radius:6px;font-size:13px;margin:8px 0}
+.err{background:var(--errbg);color:var(--err);border-left:4px solid var(--err);padding:8px 10px;border-radius:6px;margin-top:8px}.ok{background:var(--okbg);color:var(--okc);border-left:4px solid var(--okc);padding:8px 10px;border-radius:6px;margin-top:8px}
+.scroll{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:13px}th,td{padding:5px 8px;border-bottom:1px solid var(--line);text-align:left;overflow-wrap:anywhere}.scroll th,.scroll td{white-space:nowrap;overflow-wrap:normal}tr.c{cursor:pointer}tr.c:hover{background:var(--bg)}
+svg{width:100%;height:auto;display:block}svg text{fill:var(--ink);font-size:11px}.ax{stroke:var(--line)}.na{color:var(--mut);font-style:italic}
+.empty{text-align:center;padding:40px 12px}.hm td{text-align:center;color:#102A43}code{font-size:12px}.chip{display:inline-block;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:99px;padding:2px 10px;font-size:12px;margin:2px}
+.ident{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center;margin-bottom:12px;padding:12px 14px;background:var(--card);border:1px solid var(--line);border-left:6px solid var(--acc);border-radius:14px}.icao{font-size:30px;font-weight:800;letter-spacing:.08em;color:var(--acc)}.ident h2{margin:0;font-size:16px}
+.hero{padding:22px}.herom{display:flex;align-items:center;gap:16px;flex-wrap:wrap}.hero h2{margin:4px 0 0;font-size:20px}.spin{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin .9s linear infinite;vertical-align:-2px;margin-right:6px}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.anim .d{stroke-dashoffset:0}.anim .fl,.anim .rw{opacity:1}}
+</style></head><body>
+<div class="sky" aria-hidden="true"><svg viewBox="0 0 120 50"><path id="cl" d="M25 46c-12 0-21-6-21-14s8-14 18-13C25 8 38 2 50 6c7-8 26-6 30 8 14-2 28 4 28 16 0 10-8 18-19 18z"/></svg><svg viewBox="0 0 120 50"><use href="#cl"/></svg><svg viewBox="0 0 120 50"><use href="#cl"/></svg></div>
+<header><div class="brand"><span id="hm"></span><div><div class="wm">FORBSPACE</div><small>Weather Analytics · historical data, not live</small></div></div><div><label class="th">Theme<select id="theme" aria-label="Theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label><small id="net" aria-live="polite"></small></div></header>
+<nav id="nav" role="tablist" aria-label="Views"></nav><main id="app"></main>
+<script>
+/* Pure calculation layer: parsing, normalisation, filters, statistics. No DOM. */
+const Calc = (() => {
+  const parseCSV = (text) => {
+    const rows = []; let r = [], f = '', q = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (q) { if (c === '"') { if (text[i + 1] === '"') { f += '"'; i++; } else q = false; } else f += c; }
+      else if (c === '"') q = true;
+      else if (c === ',') { r.push(f); f = ''; }
+      else if (c === '\n' || c === '\r') { if (c === '\r' && text[i + 1] === '\n') i++; r.push(f); f = ''; if (r.length > 1 || r[0] !== '') rows.push(r); r = []; }
+      else f += c;
+    }
+    if (f !== '' || r.length) { r.push(f); rows.push(r); }
+    return { headers: rows.shift() || [], rows };
+  };
+  const FIELDS = ['airport','time','wdir','wspd','gust','pres','vis','temp','dew','rh','cloud','precip','metar'];
+  const RX = { airport:/station|airport|icao|ident/i, time:/date|time|valid/i, gust:/gust/i, wdir:/wind\s*dir|wdir|drct/i,
+    wspd:/wind\s*speed|wspd|sknt/i, pres:/altim|qnh|pressure|slp/i, vis:/visib/i, dew:/dew/i, rh:/humid|relh|\brh\b/i,
+    temp:/temp|tmp/i, cloud:/cloud|ceil/i, precip:/precip|rain|p01/i, metar:/metar|raw/i };
+  const guessMap = (headers) => {
+    const map = {}, used = new Set();
+    for (const k of ['gust','wdir','wspd','dew','rh','pres','vis','precip','metar','cloud','time','airport','temp']) {
+      const i = headers.findIndex((h, j) => !used.has(j) && RX[k].test(h) && !(k === 'temp' && /dew/i.test(h)));
+      map[k] = i; if (i >= 0) used.add(i);
+    }
+    return map;
+  };
+  const guessUnits = (headers, map) => {
+    const h = (k) => (map[k] >= 0 ? headers[map[k]] : '');
+    return {
+      wspd: /m\/s|mps/i.test(h('wspd')) ? 'mps' : /km\/h|kmh/i.test(h('wspd')) ? 'kmh' : 'kt',
+      pres: /inch|\(in\)|inhg/i.test(h('pres')) ? 'inHg' : /kpa/i.test(h('pres')) ? 'kPa' : 'hPa',
+      vis: /mile|\(mi\)/i.test(h('vis')) ? 'mi' : /\bkm\b/i.test(h('vis')) ? 'km' : /meter|\(m\)/i.test(h('vis')) ? 'm' : 'km',
+      cloud: /\(m\)|meter/i.test(h('cloud')) ? 'm' : 'ft',
+    };
+  };
+  const K = { wspd:{kt:1,mps:1.943844,kmh:0.539957}, pres:{hPa:1,inHg:33.8639,kPa:10}, vis:{km:1,mi:1.609344,m:0.001}, cloud:{ft:1,m:3.28084} };
+  const num = (v) => { if (v == null) return null; const s = String(v).trim(); if (!s || /^(null|nan|m|na|n\/a|-)$/i.test(s)) return null; const x = parseFloat(s); return Number.isFinite(x) ? x : null; };
+  const parseTime = (v) => {
+    const s = String(v ?? '').trim(); if (!s) return null;
+    if (/^\d+(\.\d+)?$/.test(s) && +s > 20000 && +s < 80000) return Math.round((+s - 25569) * 86400000); // Excel serial date (UTC)
+    const m = s.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2}))?(Z|[+-]\d{2}:?\d{2})?$/);
+    if (m && !m[7]) return Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +(m[6] || 0));
+    const t = Date.parse(s); return Number.isFinite(t) ? t : null;
+  };
+  const ceilFromMetar = (s) => { // lowest BKN/OVC/VV layer in ft AGL; null = none reported
+    let best = null; for (const m of String(s).matchAll(/\b(BKN|OVC|VV)(\d{3})\b/g)) { const h = +m[2] * 100; if (best == null || h < best) best = h; }
+    return best;
+  };
+  const normalise = (table, map, units) => {
+    const g = (row, k) => (map[k] >= 0 ? row[map[k]] : null);
+    const recs = []; const meta = { rows: table.rows.length, badTime: 0, ceilMode: map.metar >= 0 ? 'metar' : map.cloud >= 0 ? 'lowest-layer' : 'none', conversions: [] };
+    if (map.metar >= 0) meta.conversions.push('Ceiling = lowest BKN/OVC/VV layer parsed from the METAR text (FEW/SCT are not ceilings). No such layer = "no ceiling".');
+    else if (map.cloud >= 0) meta.conversions.push('No METAR text mapped: the mapped cloud-height column is used as-is and is the lowest layer of ANY cover (may include FEW/SCT), so it is not a true ceiling.');
+    if (units.wspd !== 'kt') meta.conversions.push(`Wind speed ${units.wspd} → kt (×${K.wspd[units.wspd]}).`);
+    if (units.pres !== 'hPa') meta.conversions.push(`Pressure ${units.pres} → hPa (×${K.pres[units.pres]}).`);
+    if (units.vis !== 'km') meta.conversions.push(`Visibility ${units.vis} → km (×${K.vis[units.vis]}).`);
+    meta.conversions.push('Timestamps without a timezone are treated as UTC (the file does not state a timezone).');
+    meta.conversions.push('Wind direction 0° is treated as 360° (north). Calm = speed 0 kt; calm winds are excluded from direction and runway statistics.');
+    table.rows.forEach((row, i) => {
+      const t = parseTime(g(row, 'time')); if (t == null) { meta.badTime++; return; }
+      const d = new Date(t); const metar = map.metar >= 0 ? String(row[map.metar] ?? '') : '';
+      const cl = num(g(row, 'cloud')); const cloudFt = cl == null ? null : cl * K.cloud[units.cloud];
+      const sc = (k, f) => { const x = num(g(row, k)); return x == null ? null : x * f; };
+      let wd = num(g(row, 'wdir')); if (wd === 0) wd = 360; if (wd != null && (wd < 0 || wd > 360)) wd = null;
+      recs.push({ id: i, ap: String(g(row, 'airport') ?? 'UNKNOWN').trim() || 'UNKNOWN', t, y: d.getUTCFullYear(), mo: d.getUTCMonth() + 1, h: d.getUTCHours(),
+        wd, ws: sc('wspd', K.wspd[units.wspd]), gu: sc('gust', K.wspd[units.wspd]), p: sc('pres', K.pres[units.pres]), vis: sc('vis', K.vis[units.vis]),
+        T: num(g(row, 'temp')), Td: num(g(row, 'dew')), rh: num(g(row, 'rh')), pr: num(g(row, 'precip')),
+        ceil: map.metar >= 0 ? (metar ? ceilFromMetar(metar) : undefined) : cloudFt, ceilKnown: map.metar >= 0 ? !!metar : cloudFt != null, raw: metar });
+    });
+    meta.used = recs.length; return { recs, meta };
+  };
+  const filter = (recs, f) => recs.filter((r) => (!f.ap || r.ap === f.ap) && r.y >= f.y0 && r.y <= f.y1 && (!f.mo || r.mo === f.mo) && (f.hr < 0 || r.h === f.hr));
+  const mean = (a) => (a.length ? a.reduce((s, x) => s + x, 0) / a.length : null);
+  const pctile = (a, p) => { if (!a.length) return null; const s = [...a].sort((x, y) => x - y); const i = (s.length - 1) * p / 100, lo = Math.floor(i); return s[lo] + (s[Math.min(lo + 1, s.length - 1)] - s[lo]) * (i - lo); };
+  const lgam = (x) => { const c = [76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5]; let y = x, t = x + 5.5; t -= (x + .5) * Math.log(t); let s = 1.000000000190015; for (const k of c) s += k / ++y; return -t + Math.log(2.5066282746310005 * s / x); };
+  const betacf = (a, b, x) => { const T = 1e-30; let c = 1, d = 1 - (a + b) * x / (a + 1); if (Math.abs(d) < T) d = T; d = 1 / d; let h = d;
+    for (let m = 1; m <= 200; m++) { const m2 = 2 * m; let aa = m * (b - m) * x / ((a - 1 + m2) * (a + m2)); d = 1 + aa * d; if (Math.abs(d) < T) d = T; c = 1 + aa / c; if (Math.abs(c) < T) c = T; d = 1 / d; h *= d * c;
+      aa = -(a + m) * (a + b + m) * x / ((a + m2) * (a + 1 + m2)); d = 1 + aa * d; if (Math.abs(d) < T) d = T; c = 1 + aa / c; if (Math.abs(c) < T) c = T; d = 1 / d; const del = d * c; h *= del; if (Math.abs(del - 1) < 3e-12) break; } return h; };
+  const ibeta = (x, a, b) => { if (x <= 0) return 0; if (x >= 1) return 1; const bt = Math.exp(lgam(a + b) - lgam(a) - lgam(b) + a * Math.log(x) + b * Math.log(1 - x)); return x < (a + 1) / (a + b + 2) ? bt * betacf(a, b, x) / a : 1 - bt * betacf(b, a, 1 - x) / b; };
+  const ols = (xs, ys) => { const n = xs.length; if (n < 3) return null; const mx = mean(xs), my = mean(ys); let sxx = 0, sxy = 0, syy = 0;
+    xs.forEach((x, i) => { sxx += (x - mx) ** 2; sxy += (x - mx) * (ys[i] - my); syy += (ys[i] - my) ** 2; });
+    const slope = sxy / sxx, icpt = my - slope * mx, sse = syy - slope * sxy, df = n - 2; const se = Math.sqrt(sse / df / sxx);
+    const p = se === 0 ? 0 : ibeta(df / (df + (slope / se) ** 2), df / 2, .5); return { slope, icpt, n, r2: syy ? 1 - sse / syy : 0, p }; };
+  const sector = (d) => Math.floor((((d % 360) + 360) % 360 + 11.25) / 22.5) % 16;
+  const BANDS = [0, 5, 10, 15, 20];
+  const rose = (R) => { const counts = Array.from({ length: 16 }, () => [0, 0, 0, 0, 0]); const sp = Array.from({ length: 16 }, () => []); let calm = 0, n = 0, nd = 0;
+    for (const r of R) { if (r.ws == null) continue; n++; if (r.ws === 0) { calm++; continue; } if (r.wd == null) continue; nd++; const s = sector(r.wd); let b = 0; BANDS.forEach((e, i) => { if (r.ws >= e && r.ws > 0) b = i; }); counts[s][b]++; sp[s].push(r.ws); }
+    return { n, calm, nd, counts, sp }; };
+  const components = (R, hdg, th) => { let n = 0, head = 0, tail = 0, tailX = 0, xwX = 0; const xs = [];
+    for (const r of R) { if (r.ws == null || r.wd == null || r.ws === 0) continue; n++; const a = (r.wd - hdg) * Math.PI / 180; const hw = r.ws * Math.cos(a), xw = Math.abs(r.ws * Math.sin(a));
+      if (hw > 0) head++; else if (hw < 0) tail++; if (hw <= -th.tail) tailX++; if (xw >= th.xw) xwX++; xs.push(xw); }
+    return { n, head, tail, tailX, xwX, xwP90: pctile(xs, 90) }; };
+  const group = (R, keyFn, valFn) => { const m = new Map(); for (const r of R) { const k = keyFn(r), v = valFn(r); if (v == null) continue; (m.get(k) || m.set(k, []).get(k)).push(v); } return m; };
+  const share = (R, valid, test) => { let n = 0, k = 0; for (const r of R) { if (!valid(r)) continue; n++; if (test(r)) k++; } return { n, k, pct: n ? 100 * k / n : null }; };
+  const CORE = ['wd', 'ws', 'p', 'vis', 'T'];
+  const missing = (R) => Object.fromEntries(['wd','ws','gu','p','vis','T','Td','rh','pr','ceilKnown'].map((k) => [k, R.length ? 100 * R.filter((r) => r[k] == null || r[k] === false).length / R.length : null]));
+  const csvCell = (v) => { const s = v == null ? '' : String(v); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+  const toCSV = (R) => { const cols = ['id','ap','t','wd','ws','gu','p','vis','ceil','T','Td','rh','raw']; return ['source_row,airport,utc_time,wind_dir_deg,wind_kt,gust_kt,qnh_hpa,vis_km,ceiling_ft,temp_c,dewpoint_c,rh_pct,metar'].concat(R.map((r) => cols.map((c) => csvCell(c === 't' ? new Date(r.t).toISOString() : c === 'id' ? r.id + 2 : r[c])).join(','))).join('\n'); };
+  const api = { parseCSV, guessMap, guessUnits, normalise, filter, mean, pctile, ols, sector, rose, components, group, share, missing, toCSV, ceilFromMetar, parseTime, FIELDS, BANDS, CORE };
+  return api;
+})();
+
+const $=s=>document.querySelector(s),C=Calc,NA='—';
+const TABS=[['import','Import'],['overview','Overview'],['wind','Wind & Runway'],['pc','Pressure + Ceiling'],['wx','Other weather'],['vis','Visibility'],['safety','Safety indicators'],['data','Data & audit']];
+const S={tab:'import',table:null,map:{},units:{},recs:[],meta:null,src:null,f:{ap:'',y0:0,y1:9999,mo:0,hr:-1,sector:-1},th:{vis:5,ceil:1500,tail:5,xw:15,minN:30},rw:{a:170,b:350,use:'a'},page:0,sel:null,msg:null};
+const f0=(v,d=0)=>v==null||!Number.isFinite(v)?NA:v.toFixed(d),MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const years=()=>[...new Set(S.recs.map(r=>r.y))].sort(),aps=()=>{const m=new Map();S.recs.forEach(r=>m.set(r.ap,(m.get(r.ap)||0)+1));return[...m].sort((a,b)=>b[1]-a[1])};
+const R=()=>S._R||(S._R=C.filter(S.recs,S.f)),hdg=()=>S.rw[S.rw.use];
+/* ---------- charts (inline SVG) ---------- */
+function line(labels,series,{unit='',h=220,fit=null,band=null}={}){const W=640,H=h,L=46,B=24,T=10,n=labels.length;const vs=series.flatMap(s=>s.v).filter(x=>x!=null);if(!vs.length)return'<p class="na">Not enough data for this chart (cells below the minimum sample are hidden).</p>';
+ let lo=Math.min(...vs),hi=Math.max(...vs);if(band){lo=Math.min(lo,band[0]);hi=Math.max(hi,band[1])}if(lo===hi){lo-=1;hi+=1}const pd=(hi-lo)*.1;lo-=pd;hi+=pd;const X=i=>L+(n<2?0:i*(W-L-8)/(n-1)),Y=v=>T+(H-T-B)*(1-(v-lo)/(hi-lo));
+ let o=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(series.map(s=>s.name).join(', '))} ${esc(unit)}">`;
+ for(let i=0;i<=4;i++){const v=lo+(hi-lo)*i/4,y=Y(v);o+=`<line class="ax" x1="${L}" x2="${W}" y1="${y}" y2="${y}"/><text x="${L-4}" y="${y+4}" text-anchor="end">${f0(v,Math.abs(hi-lo)<10?1:0)}</text>`}
+ if(band)o+=`<rect x="${L}" y="${Y(band[1])}" width="${W-L}" height="${Math.max(0,Y(band[0])-Y(band[1]))}" style="fill:var(--warnln)" opacity=".18"/><text x="${W-4}" y="${Y(band[1])-3}" text-anchor="end">${band[2]}</text>`;
+ labels.forEach((l,i)=>{if(n<=12||i%2==0)o+=`<text x="${X(i)}" y="${H-6}" text-anchor="middle">${l}</text>`});
+ series.forEach((s,si)=>{let d='',pen=false;s.v.forEach((v,i)=>{if(v==null){pen=false;return}d+=(pen?'L':'M')+X(i)+' '+Y(v);pen=true});o+=`<path d="${d}" fill="none" style="stroke:${s.c}" stroke-width="2.5"${si?' stroke-dasharray="6 4"':''}/>`;s.v.forEach((v,i)=>{if(v!=null)o+=`<circle cx="${X(i)}" cy="${Y(v)}" r="3.5" style="fill:${s.c}"><title>${labels[i]}: ${f0(v,1)} ${unit}</title></circle>`})});
+ if(fit)o+=`<line x1="${X(0)}" y1="${Y(fit.a)}" x2="${X(n-1)}" y2="${Y(fit.a+fit.b*(n-1))}" style="stroke:var(--c3)" stroke-width="2" stroke-dasharray="2 4"/>`;
+ return o+'</svg>'+(series.length>1?'<div class="sub">'+series.map((s,i)=>`<span style="color:${s.c}">${i?'┅':'━'}</span> ${s.name}`).join(' &nbsp; ')+'</div>':'')+`<div class="sub">${unit}</div>`+metaLine()}
+const monthly=(Rs,fn,agg='mean')=>MN.map((_,i)=>{const a=Rs.filter(r=>r.mo==i+1).map(fn).filter(x=>x!=null);return a.length<S.th.minN?null:agg=='med'?C.pctile(a,50):C.mean(a)});
+const yearly=(Rs,ys,fn,agg='mean',mo=0)=>ys.map(y=>{const a=Rs.filter(r=>r.y==y&&(!mo||r.mo==mo)).map(fn).filter(x=>x!=null);return a.length<S.th.minN*10?null:agg=='med'?C.pctile(a,50):C.mean(a)});
+function trend(ys,vals,unit){const pts=ys.map((y,i)=>[y,vals[i]]).filter(p=>p[1]!=null);const o=C.ols(pts.map(p=>p[0]),pts.map(p=>p[1]));
+ const fit=o?{a:o.icpt+o.slope*ys[0],b:o.slope}:null;return line(ys.map(String),[{name:'Annual value',c:'var(--c1)',v:vals}],{unit,fit})+(o?`<p class="sub">OLS slope <b>${o.slope.toFixed(2)} ${unit}/yr</b>, p=${o.p.toFixed(3)}, R²=${o.r2.toFixed(2)}, n=${o.n} annual points. Two-sided t-test on the slope assumes independent, roughly normal residuals; with so few points and uneven yearly coverage it is indicative only. Association, not causation. Years with fewer than ${S.th.minN*10} observations are omitted.</p>`:'<p class="na">Fewer than 3 usable annual points — no trend shown.</p>')}
+/* ---------- views ---------- */
+const AP_DIR={HUEN:{n:'Entebbe International Airport',l:'Entebbe, Uganda'}};
+const period=()=>{const ys=years(),a=Math.max(S.f.y0,ys[0]),b=Math.min(S.f.y1,ys.at(-1));return (a==b?a:a+'–'+b)+(S.f.mo?', '+MN[S.f.mo-1]:'')+(S.f.hr>=0?', '+String(S.f.hr).padStart(2,'0')+':00 UTC':'')};
+const metaLine=()=>S.src?`<div class="meta">Historical observations · ${period()} · n = ${R().length.toLocaleString()} obs in filter · Source: ${esc(S.src.name)}</div>`:'';
+function mark(a){return `<svg class="mark${a?' anim':''}" viewBox="0 0 48 48" role="img" aria-label="FORBSPACE mark: compass ring, runway and cloud"><circle class="d" cx="24" cy="24" r="21"/><path class="d d2" d="M24 3v6"/><path class="rw" d="M24 41V27M24 22v-2" stroke-dasharray="4 4"/><path class="d d2" d="M8 26h12c4 0 4-5 0-5"/><path class="fl" d="M28 21a4 4 0 0 1 7-2.5A3.5 3.5 0 0 1 36 26H29a2.6 2.6 0 0 1-1-5z"/></svg>`}
+const hero=()=>`<section class="card hero" aria-labelledby="wh"><div class="herom">${mark(true)}<div><div class="wm big">FORBSPACE</div><h2 id="wh">Explore historical airport weather</h2></div></div>
+<p>Load a weather-observation file to see wind, runway components, pressure, cloud ceiling, visibility and more, with the sample size and source shown next to every result. Everything here describes the <b>past</b>: it is not live data, a forecast, or flight clearance, and it is not affiliated with any aviation authority.</p>
+<div class="grid"><div><h3>Accepted files</h3><p class="sub">CSV (also .txt), XLSX or JSON — one table, first row = column headings.</p></div><div><h3>Fields it looks for</h3><p class="sub">Timestamp (required), airport code, wind direction, wind speed, gust, pressure/QNH, visibility, temperature, dew point, humidity, cloud height or raw METAR text, precipitation. Missing fields are fine.</p></div><div><h3>How your data is used</h3><p class="sub">Read inside this browser only. Nothing is uploaded; it is cleared when you reload. You confirm the column mapping and units before anything is analysed.</p></div></div></section>`;
+const ident=()=>{if(!S.recs.length||S.tab=='import')return'';const a=S.f.ap,d=AP_DIR[a],n=R().length;return `<section class="ident" aria-label="Selected airport"><div class="icao">${esc(a||'ALL')}</div><div><h2>${a?(d?d.n:'Airport name not in this app’s directory'):'All airports in file'}</h2><div class="sub">${d?d.l+' · ':''}Historical observations ${period()}</div></div><div><span class="chip">${a||'All airports'}</span> <span class="chip">${period()}</span> <span class="chip">${n.toLocaleString()} obs</span></div></section>`};
+function vGate(){const all=S.recs,miss=C.missing(all),m=S.meta,names={wd:'Wind direction',ws:'Wind speed',gu:'Gust',p:'Pressure',vis:'Visibility',T:'Temperature',Td:'Dew point',rh:'Humidity',pr:'Precipitation',ceilKnown:'Cloud / ceiling'},un=C.FIELDS.filter(k=>S.map[k]<0);
+ return `<section class="card" aria-labelledby="qh"><h2 id="qh" style="margin-top:0">Import summary — check before analysing</h2><div class="cards"><div class="card"><div class="k">Rows in file</div><div class="v">${m.rows.toLocaleString()}</div></div><div class="card"><div class="k">Rows analysed</div><div class="v">${m.used.toLocaleString()}</div><div class="sub">${m.badTime} unreadable time</div></div><div class="card"><div class="k">Airports</div><div class="v">${aps().length}</div></div><div class="card"><div class="k">Coverage (UTC)</div><div class="sub">${new Date(Math.min(...all.map(r=>r.t))).toISOString().slice(0,10)} → ${new Date(Math.max(...all.map(r=>r.t))).toISOString().slice(0,10)}</div></div></div>
+ <div class="scroll"><table><tr><th>Field</th><th>Missing</th><th>Status</th></tr>${Object.entries(names).map(([k,l])=>{const v=miss[k];return `<tr><td>${l}</td><td>${f0(v,1)}%</td><td>${v>50?'⚠ mostly missing':v>10?'△ some gaps':'✓ good'}</td></tr>`}).join('')}</table></div>
+ ${un.length?`<div class="note">Not mapped (related charts will show “no data”): ${un.join(', ')}.</div>`:''}<div class="note">Ceiling method: <code>${m.ceilMode}</code>. Units → kt, hPa, km, ft. Full list of conversions is on the Data &amp; audit tab.</div>
+ <p><button class="b" data-go>Continue to analysis</button> <button class="b s" data-tab="import">Back to mapping</button></p></section>`}
+
+const card=(k,v,s='')=>`<div class="card"><div class="k">${k}</div><div class="v">${v}</div><div class="sub">${s}</div></div>`;
+const pc=x=>x.pct==null||x.n<S.th.minN?NA:x.pct.toFixed(1)+'%',den=x=>`${x.k.toLocaleString()} of ${x.n.toLocaleString()} valid obs`;
+const empty=()=>'<div class="card empty"><h2>No dataset loaded</h2><p>Import a CSV, XLSX or JSON file on the Import tab. Nothing is pre-loaded and no sample data is shown.</p><button class="b" data-tab="import">Go to Import</button></div>';
+const DISC='<div class="note">Historical analytics only. Operational acceptability depends on the applicable aircraft, airport, runway, procedures and qualified operational judgment. Thresholds here are configurable monitoring indicators, not verified limits.</div>';
+function vImport(){const m=S.msg;let o=(S.table?'':hero())+`<div class="card" style="margin-top:12px"><h3>1 · Add a dataset</h3><label>File (CSV, XLSX, JSON)<input type="file" id="file" accept=".csv,.txt,.xlsx,.xls,.json"></label>
+ <label style="margin-top:8px">…or dataset URL<input id="url" type="url" placeholder="https://…/weather.csv"></label><p><button class="b" id="loadUrl">Load URL</button></p>
+ <p class="sub">URL import needs an internet connection and works only if the host allows cross-origin (CORS) requests and needs no login. Otherwise download the file and upload it, or use a server-side import. Data stays in this browser tab's memory only: nothing is uploaded to a server and nothing is saved after you close or reload the page.</p>
+ ${m?`<div class="${m.t}" role="${m.t=='err'?'alert':'status'}">${/^(Reading|Fetching)/.test(m.s)?'<span class="spin" aria-hidden="true"></span>':m.t=='err'?'<b>⚠ Couldn’t load.</b> ':'<b>✓</b> '}${esc(m.s)}</div>`:''}</div>`;
+ if(S.table){const h=S.table.headers,sel=(k,req)=>`<label>${{airport:'Airport / station',time:'Timestamp *',wdir:'Wind direction (°)',wspd:'Wind speed',gust:'Gust',pres:'Pressure / QNH / altimeter',vis:'Visibility',temp:'Temperature (°C)',dew:'Dew point (°C)',rh:'Relative humidity (%)',cloud:'Cloud height (lowest layer)',precip:'Precipitation',metar:'Raw METAR text (for ceiling)'}[k]}<select data-map="${k}"><option value="-1">— not mapped —</option>${h.map((x,i)=>`<option value="${i}"${S.map[k]==i?' selected':''}>${esc(x)}</option>`).join('')}</select></label>`;
+  const un=(k,opts)=>`<label>${k} unit<select data-unit="${k}">${opts.map(u=>`<option${S.units[k]==u?' selected':''}>${u}</option>`).join('')}</select></label>`;
+  o+=`<div class="card" style="margin-top:12px"><h3>2 · Confirm column mapping</h3><p class="sub">Columns were auto-matched from header names — please check them, especially units. Rows: ${S.table.rows.length.toLocaleString()}.</p><div class="bar">${C.FIELDS.map(k=>sel(k)).join('')}</div><div class="bar">${un('wspd',['kt','mps','kmh'])}${un('pres',['hPa','inHg','kPa'])}${un('vis',['km','mi','m'])}${un('cloud',['ft','m'])}</div><button class="b" id="apply">Validate &amp; load</button></div>`}
+ return o}
+function vOverview(){const Rs=R();if(!Rs.length)return'<div class="card empty">No observations match the current filters.</div>';const w=Rs.map(r=>r.ws).filter(x=>x!=null),vs=C.share(Rs,r=>r.vis!=null,r=>r.vis<S.th.vis),cs=C.share(Rs,r=>r.ceilKnown,r=>r.ceil!=null&&r.ceil<S.th.ceil);
+ const ce=Rs.map(r=>r.ceil).filter(x=>x!=null),nc=C.share(Rs,r=>r.ceilKnown,r=>r.ceil==null),mean=k=>C.mean(Rs.map(r=>r[k]).filter(x=>x!=null)),miss=C.missing(Rs);
+ return `<div class="cards">${card('Observations',Rs.length.toLocaleString(),'in current filter')}${card('Mean QNH',f0(mean('p'),1)+' hPa',`n=${Rs.filter(r=>r.p!=null).length.toLocaleString()}`)}${card('Wind P50 / P90',f0(C.pctile(w,50),0)+' / '+f0(C.pctile(w,90),0)+' kt',`n=${w.length.toLocaleString()}`)}${card('Mean visibility',f0(mean('vis'),1)+' km','capped ≈10 km')}${card('No ceiling',pc(nc),'share of obs with cloud data')}${card('Mean temp',f0(mean('T'),1)+' °C','')}</div>
+ <div class="grid"><div class="card"><h3>Monthly mean temperature &amp; dew point (°C)</h3>${line(MN,[{name:'Temperature',c:'var(--c3)',v:monthly(Rs,r=>r.T)},{name:'Dew point',c:'var(--c1)',v:monthly(Rs,r=>r.Td)}],{unit:'°C'})}</div>
+ <div class="card"><h3>Data quality</h3><p>Overall completeness of core fields (wind dir, wind speed, pressure, visibility, temp): <b>${f0(100-C.mean(C.CORE.map(k=>miss[k])),1)}%</b></p><div class="scroll"><table><tr><th>Field</th><th>Missing</th></tr>${Object.entries(miss).map(([k,v])=>`<tr><td>${k}</td><td>${f0(v,1)}%</td></tr>`).join('')}</table></div><p class="sub">Missing = null/blank in the source. Gust is normally only reported when gusting, so a high missing rate is expected. Months with fewer than ${S.th.minN} samples are hidden in charts.</p></div></div>${DISC}`}
+function vWind(){const Rs=R(),ro=C.rose(Rs);if(!ro.nd)return'<div class="card empty">No wind observations in this filter.</div>';const cx=170,cy=170,rad=140,tot=ro.nd,mx=Math.max(...ro.counts.map(c=>c.reduce((a,b)=>a+b,0)))/tot*100,col=['--b1','--b2','--b3','--b4','--b5'];
+ let g='';for(let i=1;i<=4;i++)g+=`<circle cx="${cx}" cy="${cy}" r="${rad*i/4}" fill="none" class="ax"/><text x="${cx+3}" y="${cy-rad*i/4-2}">${(mx*i/4).toFixed(1)}%</text>`;
+ ro.counts.forEach((c,s)=>{let r0=0;const a0=(s*22.5-11.25)*Math.PI/180,a1=(s*22.5+11.25)*Math.PI/180;c.forEach((n,b)=>{if(!n)return;const r1=r0+n/tot*100/mx*rad,p=(r,a)=>[cx+r*Math.sin(a),cy-r*Math.cos(a)];const[x0,y0]=p(r0,a0),[x1,y1]=p(r1,a0),[x2,y2]=p(r1,a1),[x3,y3]=p(r0,a1);
+  g+=`<path data-sector="${s}" tabindex="0" style="cursor:pointer;fill:var(${col[b]})" stroke="#fff" stroke-width=".5" d="M${x0} ${y0}L${x1} ${y1}A${r1} ${r1} 0 0 1 ${x2} ${y2}L${x3} ${y3}A${r0} ${r0} 0 0 0 ${x0} ${y0}Z"><title>${s*22.5}° sector, ${['0–5','5–10','10–15','15–20','20+'][b]} kt: ${n} obs (${(n/tot*100).toFixed(2)}%)</title></path>`;r0=r1})});
+ g+=['N','E','S','W'].map((t,i)=>`<text x="${cx+(rad+14)*Math.sin(i*Math.PI/2)}" y="${cy-(rad+10)*Math.cos(i*Math.PI/2)+4}" text-anchor="middle" font-weight="700">${t}</text>`).join('');
+ const lg=['0–5','5–10','10–15','15–20','20+'].map((t,i)=>`<span style="color:var(${col[i]})">■</span> ${t}`).join(' &nbsp; ');
+ const cm=C.components(Rs,hdg(),S.th),pct=x=>cm.n?(100*x/cm.n).toFixed(1)+'%':NA,gu=Rs.map(r=>r.gu).filter(x=>x!=null),ws=Rs.map(r=>r.ws).filter(x=>x!=null);
+ const tots=ro.counts.map(c=>c.reduce((a,b)=>a+b,0)),ms=tots.indexOf(Math.max(...tots)),ill=`<svg viewBox="0 0 200 200" role="img" aria-label="Runway at ${hdg()} degrees with arrow for most frequent wind from ${ms*22.5} degrees"><circle cx="100" cy="100" r="88" fill="none" class="ax"/><text x="100" y="12" text-anchor="middle">N</text><g transform="rotate(${hdg()} 100 100)"><rect x="92" y="36" width="16" height="128" rx="2" style="fill:var(--mut)"/><line x1="100" y1="42" x2="100" y2="158" style="stroke:var(--card)" stroke-dasharray="8 6" stroke-width="2"/></g><g transform="rotate(${ms*22.5} 100 100)"><path d="M100 66L93 48H97V20H103V48H107Z" style="fill:var(--c3)"/></g></svg>`;
+ return `<div class="grid"><div class="card"><h3>Runway orientation vs. most frequent wind</h3>${ill}<p class="sub">Illustration only — not a map, not live. Runway drawn at your entered heading (${hdg()}°). The arrow points the way the wind blows, from the most frequent sector in the current filter (${ms*22.5}°, ${(100*tots[ms]/ro.nd).toFixed(1)}% of non-calm obs).</p></div><div class="card"><h3>Wind rose (direction wind blows <i>from</i>, 16 sectors of 22.5°)</h3><svg viewBox="0 0 340 340" role="img" aria-label="Wind rose">${g}</svg><div class="sub">Speed bands (kt): ${lg}</div><p class="sub">Tap a sector to list its observations. Calm (0 kt): ${(100*ro.calm/ro.n).toFixed(1)}% of ${ro.n.toLocaleString()} wind obs, excluded from the rose. Percent of non-calm obs with direction (n=${ro.nd.toLocaleString()}).</p>${metaLine()}</div>
+ <div class="card"><h3>Speed percentiles (kt)</h3><table><tr><th></th><th>P50</th><th>P90</th><th>P99</th><th>n</th></tr><tr><td>Wind</td><td>${f0(C.pctile(ws,50))}</td><td>${f0(C.pctile(ws,90))}</td><td>${f0(C.pctile(ws,99))}</td><td>${ws.length.toLocaleString()}</td></tr><tr><td>Gust</td>${gu.length<S.th.minN?'<td colspan=3 class="na">insufficient gust data</td>':[50,90,99].map(p=>`<td>${f0(C.pctile(gu,p))}</td>`).join('')}<td>${gu.length.toLocaleString()}</td></tr></table>
+ <h3 style="margin-top:14px">Runway components</h3><div class="bar"><label>Runway end A heading °<input type="number" data-rw="a" value="${S.rw.a}" min="0" max="360"></label><label>End B heading °<input type="number" data-rw="b" value="${S.rw.b}" min="0" max="360"></label><label>Evaluate for<select data-rw="use"><option value="a"${S.rw.use=='a'?' selected':''}>End A (${S.rw.a}°)</option><option value="b"${S.rw.use=='b'?' selected':''}>End B (${S.rw.b}°)</option></select></label></div>
+ <table><tr><th>Component (runway ${hdg()}°)</th><th>Share</th></tr><tr><td>Headwind component &gt; 0</td><td>${pct(cm.head)}</td></tr><tr><td>Tailwind component &gt; 0</td><td>${pct(cm.tail)}</td></tr><tr><td>Tailwind ≥ ${S.th.tail} kt</td><td>${pct(cm.tailX)}</td></tr><tr><td>Crosswind ≥ ${S.th.xw} kt</td><td>${pct(cm.xwX)}</td></tr><tr><td>Crosswind P90</td><td>${f0(cm.xwP90)} kt</td></tr></table>
+ <p class="sub">Denominator: ${cm.n.toLocaleString()} non-calm obs with direction and speed. Headwind = speed·cos(wind dir − heading); crosswind = |speed·sin(…)|. <b>Assumption:</b> headings you enter are compared directly with reported wind direction, which is relative to true north; runway numbers are magnetic and the magnetic variation is <u>not</u> applied. Enter true headings for a rigorous comparison.</p></div></div>${DISC}`}
+function vPC(){const Rs=R(),ys=years().filter(y=>y>=S.f.y0&&y<=S.f.y1),mo=S.f.mo,hasC=Rs.some(r=>r.ceilKnown),hasP=Rs.some(r=>r.p!=null);
+ return `<div class="grid"><div class="card"><h3>QNH by calendar month (mean, hPa)</h3>${hasP?line(MN,[{name:'QNH',c:'var(--c1)',v:monthly(Rs,r=>r.p)}],{unit:'hPa'}):'<p class="na">No pressure field mapped.</p>'}<p class="sub">Pressure converted from the source unit. Months pool all selected years.</p></div>
+ <div class="card"><h3>Ceiling by calendar month (median, ft AGL)</h3>${hasC?line(MN,[{name:'Median ceiling (when present)',c:'var(--c4)',v:monthly(Rs,r=>r.ceil,'med')}],{unit:'ft AGL',band:[0,S.th.ceil,'below '+S.th.ceil+' ft threshold']}):'<p class="na">No cloud/METAR field mapped.</p>'}
+ ${hasC?'<h3>% of observations with no ceiling</h3>'+line(MN,[{name:'No ceiling %',c:'var(--c2)',v:MN.map((_,i)=>{const x=C.share(Rs.filter(r=>r.mo==i+1),r=>r.ceilKnown,r=>r.ceil==null);return x.n<S.th.minN?null:x.pct})}],{unit:'% of obs'}):''}<p class="sub">Median is over observations that report a ceiling; ceiling mode: <code>${S.meta?.ceilMode}</code> (see Data &amp; audit).</p></div>
+ <div class="card"><h3>Annual QNH trend${mo?' — '+MN[mo-1]:''} (hPa)</h3>${hasP?trend(ys,yearly(Rs,ys,r=>r.p,'mean'),'hPa'):''}</div>
+ <div class="card"><h3>Annual median ceiling trend${mo?' — '+MN[mo-1]:''} (ft)</h3>${hasC?trend(ys,yearly(Rs,ys,r=>r.ceil,'med'),'ft'):''}</div></div>
+ <div class="note">Falling pressure and lower ceilings may co-occur seasonally; this is descriptive. Use the Month filter to see one month's own annual trend. Partial years (e.g. an incomplete first year) can bias annual means.</div>${DISC}`}
+function vWx(){const Rs=R(),has=k=>Rs.some(r=>r[k]!=null),ys=years().filter(y=>y>=S.f.y0&&y<=S.f.y1);
+ return `<div class="grid"><div class="card"><h3>Temperature &amp; dew point, monthly mean (°C)</h3>${line(MN,[{name:'Temperature',c:'var(--c3)',v:monthly(Rs,r=>r.T)},{name:'Dew point',c:'var(--c1)',v:monthly(Rs,r=>r.Td)}],{unit:'°C'})}</div>
+ <div class="card"><h3>Relative humidity, monthly mean (%)</h3>${has('rh')?line(MN,[{name:'RH',c:'var(--c2)',v:monthly(Rs,r=>r.rh)}],{unit:'%'}):'<p class="na">No humidity field mapped.</p>'}</div>
+ <div class="card"><h3>Annual mean temperature (°C)</h3>${trend(ys,yearly(Rs,ys,r=>r.T),'°C')}</div>
+ <div class="card"><h3>Precipitation</h3>${has('pr')?line(MN,[{name:'Monthly total',c:'var(--c1)',v:MN.map((_,i)=>{const a=Rs.filter(r=>r.mo==i+1&&r.pr!=null);return a.length<S.th.minN?null:a.reduce((s,r)=>s+r.pr,0)/Math.max(1,new Set(a.map(r=>r.y)).size)})}],{unit:'mean total per year (source unit)'}):'<p class="na">No precipitation field in this dataset. Provide a precipitation column (e.g. hourly amount) to enable rain totals and rain-day share.</p>'}</div>
+ <div class="card"><h3>Density altitude</h3><p class="na">Not implemented in this version.</p></div></div>`}
+function vVis(){const Rs=R(),ok=Rs.some(r=>r.vis!=null);if(!ok)return'<div class="card empty">No visibility field mapped or no data in this filter.</div>';const CAP=9.9,TH=[[10,'&lt;10 km (below cap)'],[5,'&lt;5 km'],[3,'&lt;3 km']],tt=t=>t==10?CAP:t;
+ const hm=MN.map((_,i)=>{const m=Rs.filter(r=>r.mo==i+1);return TH.map(([t])=>{const x=C.share(m,r=>r.vis!=null,r=>r.vis<tt(t));return x.n<S.th.minN?null:x.pct})}),colr=v=>v==null?'transparent':`hsl(${Math.max(0,120-v*3)} 70% 75%)`;
+ return `<div class="grid"><div class="card"><h3>Monthly mean visibility (km)</h3>${line(MN,[{name:'Mean visibility',c:'var(--c1)',v:monthly(Rs,r=>r.vis)}],{unit:'km',band:[0,S.th.vis,'below '+S.th.vis+' km threshold']})}<div class="note"><b>Cap:</b> reported visibility tops out near 10 km (9999 m); values ≥ ${CAP} km are treated as the cap, so means are biased low and "&lt;10 km" counts only values clearly below the cap. Source values are rounded, so threshold results near 3/5 km carry conversion rounding.</div></div>
+ <div class="card"><h3>Threshold exposure (% of valid obs)</h3><table>${TH.map(([t,l])=>{const x=C.share(Rs,r=>r.vis!=null,r=>r.vis<tt(t));return`<tr><td>${l}</td><td><b>${pc(x)}</b></td><td class="sub">${den(x)}</td></tr>`}).join('')}</table>
+ <h3 style="margin-top:12px">Month × threshold heatmap (%)</h3><div class="scroll"><table class="hm"><tr><th>Month</th>${TH.map(t=>`<th>${t[1]}</th>`).join('')}</tr>${MN.map((m,i)=>`<tr><th>${m}</th>${hm[i].map(v=>`<td style="background:${colr(v)}">${v==null?NA:v.toFixed(1)}</td>`).join('')}</tr>`).join('')}</table></div><p class="sub">Cells with &lt; ${S.th.minN} samples are blank. Colour is relative exposure, not a VFR/IFR classification (that needs ceiling + visibility minima for the specific operation).</p></div></div>${DISC}`}
+function vSafety(){const Rs=R(),vs=C.share(Rs,r=>r.vis!=null,r=>r.vis<S.th.vis),cs=C.share(Rs,r=>r.ceilKnown,r=>r.ceil!=null&&r.ceil<S.th.ceil),cm=C.components(Rs,hdg(),S.th),gu=Rs.map(r=>r.gu).filter(x=>x!=null),miss=C.missing(Rs),comp=100-C.mean(C.CORE.map(k=>miss[k]));
+ const th=(k,l,st)=>`<label>${l}<input type="number" data-th="${k}" value="${S.th[k]}" step="${st}" min="0"></label>`;
+ const row=(n,x,m)=>`<tr><td>${n}</td><td><b>${pc(x)}</b></td><td>${den(x)}</td><td>${m}</td></tr>`;
+ return `<div class="card"><h3>Configurable monitoring thresholds</h3><div class="bar">${th('vis','Visibility below (km)',.5)}${th('ceil','Ceiling below (ft)',100)}${th('tail','Tailwind ≥ (kt)',1)}${th('xw','Crosswind ≥ (kt)',1)}${th('minN','Minimum sample',10)}</div><p class="sub">Defaults are arbitrary examples, not regulatory or operator limits. Runway heading ${hdg()}° (edit on Wind &amp; Runway).</p></div>
+ <div class="card scroll" style="margin-top:12px"><table><tr><th>Indicator</th><th>Exposure</th><th>Denominator</th><th>Review</th></tr>
+ ${row('Visibility &lt; '+S.th.vis+' km',vs,'Check seasonal/hourly concentration')}${row('Ceiling &lt; '+S.th.ceil+' ft',cs,'Counts obs with cloud data only')}
+ ${row('Tailwind ≥ '+S.th.tail+' kt',{n:cm.n,k:cm.tailX,pct:cm.n?100*cm.tailX/cm.n:null},'Non-calm obs, runway '+hdg()+'°')}${row('Crosswind ≥ '+S.th.xw+' kt',{n:cm.n,k:cm.xwX,pct:cm.n?100*cm.xwX/cm.n:null},'Non-calm obs')}
+ <tr><td>Gust P99</td><td><b>${gu.length<S.th.minN?NA:f0(C.pctile(gu,99))+' kt'}</b></td><td>${gu.length.toLocaleString()} gust reports</td><td>Gusts only reported when gusting — not a share of all hours</td></tr>
+ <tr><td>Data completeness</td><td><b>${f0(comp,1)}%</b></td><td>${Rs.length.toLocaleString()} obs</td><td>Mean non-missing share of core fields</td></tr></table></div>
+ <div class="note">Exposure is the share of <i>observed</i> reports meeting the condition. Observations are not equally spaced (the record has gaps), so this is not "% of hours". Filter by month/hour to see where exposure concentrates.</div>${DISC}`}
+function vData(){const all=S.recs;let Rs=R();if(S.f.sector>=0)Rs=Rs.filter(r=>r.wd!=null&&r.ws>0&&C.sector(r.wd)==S.f.sector);const m=S.meta,src=S.src,ys=years(),per=60;const pg=Math.min(S.page,Math.max(0,Math.ceil(Rs.length/per)-1)),rows=Rs.slice(pg*per,pg*per+per);
+ const miss=C.missing(all),sel=S.sel!=null?S.table.rows[S.sel]:null;
+ return `<div class="grid"><div class="card"><h3>Source &amp; audit trail</h3><table><tr><td>Dataset</td><td>${esc(src.name)}</td></tr><tr><td>Source id / URL</td><td>${esc(src.id)}</td></tr><tr><td>Imported (this browser)</td><td>${esc(src.at)}</td></tr><tr><td>Rows in file</td><td>${m.rows.toLocaleString()}</td></tr><tr><td>Records used</td><td>${m.used.toLocaleString()}</td></tr><tr><td>Rows with unreadable time (not analysed)</td><td>${m.badTime}</td></tr><tr><td>Coverage</td><td>${new Date(Math.min(...all.map(r=>r.t))).toISOString().slice(0,16)} → ${new Date(Math.max(...all.map(r=>r.t))).toISOString().slice(0,16)} UTC</td></tr><tr><td>Missing wind / QNH / vis</td><td>${f0(miss.ws,1)}% / ${f0(miss.p,1)}% / ${f0(miss.vis,1)}%</td></tr><tr><td>Units</td><td>${esc(JSON.stringify(S.units))} → kt, hPa, km, ft</td></tr><tr><td>Mapping</td><td>${esc(Object.entries(S.map).filter(e=>e[1]>=0).map(e=>e[0]+'='+S.table.headers[e[1]]).join('; '))}</td></tr></table>
+ <h4>Transformations &amp; rules</h4><ul>${m.conversions.map(c=>`<li>${esc(c)}</li>`).join('')}<li>No source rows are deleted; filters only hide rows from views. Source row numbers are kept (row 2 = first data row).</li></ul></div>
+ <div class="card"><h3>Observations per year (all airports)</h3><div class="scroll"><table><tr><th>Year</th><th>Obs</th></tr>${ys.map(y=>`<tr><td>${y}</td><td>${all.filter(r=>r.y==y).length.toLocaleString()}</td></tr>`).join('')}</table></div><p class="sub">Uneven yearly counts affect annual comparisons.</p></div></div>
+ <div class="card" style="margin-top:12px"><h3>Observations (${Rs.length.toLocaleString()} match)${S.f.sector>=0?` <span class="chip">sector ${S.f.sector*22.5}° <button class="b s" data-clear>clear</button></span>`:''}</h3><div class="bar" style="max-width:520px"><button class="b" id="expCsv">Export filtered CSV</button><button class="b s" id="expJson">Export summary JSON</button></div><div class="scroll"><table><tr><th>Src row</th><th>Airport</th><th>UTC</th><th>Dir°</th><th>Spd kt</th><th>Gust</th><th>QNH hPa</th><th>Vis km</th><th>Ceil ft</th><th>T °C</th></tr>
+ ${rows.map(r=>`<tr class="c" tabindex="0" data-row="${r.id}"><td>${r.id+2}</td><td>${esc(r.ap)}</td><td>${new Date(r.t).toISOString().slice(0,16).replace('T',' ')}</td><td>${f0(r.wd)}</td><td>${f0(r.ws)}</td><td>${f0(r.gu)}</td><td>${f0(r.p,1)}</td><td>${f0(r.vis,1)}</td><td>${r.ceilKnown?(r.ceil==null?'none':r.ceil):NA}</td><td>${f0(r.T,1)}</td></tr>`).join('')}</table></div>
+ <p><button class="b s" data-pg="-1">‹ Prev</button> page ${pg+1} <button class="b s" data-pg="1">Next ›</button></p>
+ ${sel?`<div class="note"><b>Source row ${S.sel+2}</b> (original values)<br>${S.table.headers.map((h,i)=>`<code>${esc(h)}</code>: ${esc(sel[i])}`).join('<br>')}</div>`:''}</div>`}
+/* ---------- shell ---------- */
+const VIEWS={import:vImport,overview:vOverview,wind:vWind,pc:vPC,wx:vWx,vis:vVis,safety:vSafety,data:vData};
+function filters(){if(!S.recs.length||S.tab=='import')return'';const ys=years(),o=(v,l,s)=>`<option value="${v}"${s?' selected':''}>${l}</option>`;
+ return `<div class="bar" role="group" aria-label="Filters"><label>Airport<select data-f="ap">${o('','All airports',!S.f.ap)}${aps().map(([a,n])=>o(a,`${a} (${n.toLocaleString()})`,S.f.ap==a)).join('')}</select></label>
+ <label>From year<select data-f="y0">${ys.map(y=>o(y,y,S.f.y0==y||(!ys.includes(S.f.y0)&&y==ys[0]))).join('')}</select></label><label>To year<select data-f="y1">${ys.map(y=>o(y,y,S.f.y1==y||(!ys.includes(S.f.y1)&&y==ys.at(-1)))).join('')}</select></label>
+ <label>Month<select data-f="mo">${o(0,'All months',!S.f.mo)}${MN.map((m,i)=>o(i+1,m,S.f.mo==i+1)).join('')}</select></label><label>Hour (UTC)<select data-f="hr">${o(-1,'All hours',S.f.hr<0)}${[...Array(24).keys()].map(h=>o(h,String(h).padStart(2,'0')+':00',S.f.hr==h)).join('')}</select></label></div>`}
+function render(){const y=years();if(y.length&&S.f.y0<y[0])S.f.y0=y[0];if(y.length&&S.f.y1>y.at(-1))S.f.y1=y.at(-1);
+ $('#nav').innerHTML=TABS.map(([k,l])=>`<button role="tab" aria-selected="${S.tab==k}" data-tab="${k}">${l}</button>`).join('');
+ S._R=null;const gate=S.recs.length&&S.qa;$('#app').innerHTML=(gate?'':ident()+filters())+(gate?vGate():(S.recs.length||S.tab=='import')?VIEWS[S.tab]():empty())}
+function setMsg(t,s){S.msg={t,s};render()}
+function ingest(table,name,id){if(!table.headers.length||!table.rows.length)return setMsg('err','The file has no header row or no data rows.');S.table=table;S.map=C.guessMap(table.headers);S.units=C.guessUnits(table.headers,S.map);S.src={name,id,at:new Date().toISOString()};setMsg('ok',`Read ${table.rows.length.toLocaleString()} rows × ${table.headers.length} columns. Confirm the mapping below, then load.`)}
+async function readXlsx(buf){const u=new Uint8Array(buf),dv=new DataView(buf),td=new TextDecoder();let e=u.length-22;while(e>=0&&dv.getUint32(e,true)!==0x06054b50)e--;if(e<0)throw Error('not a valid .xlsx file');
+ const n=dv.getUint16(e+10,true);let p=dv.getUint32(e+16,true);const F={};
+ for(let i=0;i<n;i++){const nl=dv.getUint16(p+28,true);F[td.decode(u.subarray(p+46,p+46+nl))]={m:dv.getUint16(p+10,true),z:dv.getUint32(p+20,true),o:dv.getUint32(p+42,true)};p+=46+nl+dv.getUint16(p+30,true)+dv.getUint16(p+32,true)}
+ const get=async k=>{const f=F[k];if(!f)return null;const st=f.o+30+dv.getUint16(f.o+26,true)+dv.getUint16(f.o+28,true),d=u.subarray(st,st+f.z);if(f.m===0)return td.decode(d);if(typeof DecompressionStream=='undefined')throw Error('this browser cannot unzip .xlsx — save the sheet as CSV');return await new Response(new Blob([d]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).text()};
+ const xml=t=>new DOMParser().parseFromString(t,'application/xml'),sk=Object.keys(F).filter(k=>/^xl\/worksheets\/sheet\d+\.xml$/.test(k)).sort((a,b)=>parseInt(a.match(/\d+/))-parseInt(b.match(/\d+/)))[0];if(!sk)throw Error('no worksheet found');
+ const ss=await get('xl/sharedStrings.xml'),strs=ss?[...xml(ss).getElementsByTagName('si')].map(si=>[...si.getElementsByTagName('t')].map(t=>t.textContent).join('')):[];
+ const rows=[];for(const r of xml(await get(sk)).getElementsByTagName('row')){const row=[];for(const c of r.getElementsByTagName('c')){const ref=c.getAttribute('r')||'',L=ref.replace(/\d/g,'');let ci=0;for(const ch of L)ci=ci*26+ch.charCodeAt(0)-64;ci=L?ci-1:row.length;const t=c.getAttribute('t'),v=c.getElementsByTagName('v')[0],is=c.getElementsByTagName('is')[0];
+  row[ci]=t=='s'?strs[+v.textContent]??'':t=='inlineStr'&&is?[...is.getElementsByTagName('t')].map(x=>x.textContent).join(''):v?v.textContent:''}rows.push(row)}
+ if(!rows.length)throw Error('the first sheet is empty');const w=Math.max(...rows.map(r=>r.length));const g=rows.map(r=>Array.from({length:w},(_,i)=>String(r[i]??'')));return{headers:g[0],rows:g.slice(1)}}
+async function readFile(file){setMsg('ok','Reading '+file.name+'…');try{const ext=file.name.split('.').pop().toLowerCase();let table;
+ if(ext=='xlsx')table=await readXlsx(await file.arrayBuffer());else if(ext=='xls')throw Error('old .xls files are not supported — save as .xlsx or CSV');
+ else if(ext=='json'){table=jsonTable(JSON.parse(await file.text()))}else table=C.parseCSV(await file.text());ingest(table,file.name,'file:'+file.name+' ('+file.size+' bytes)')}catch(e){setMsg('err','Could not read file: '+e.message)}}
+function jsonTable(j){const a=Array.isArray(j)?j:j.data||j.records||j.observations;if(!Array.isArray(a)||!a.length||typeof a[0]!='object')throw Error('Expected a JSON array of objects (or {data:[…]}).');const h=[...new Set(a.flatMap(o=>Object.keys(o)))];return{headers:h,rows:a.map(o=>h.map(k=>o[k]==null?'':String(o[k])))}}
+async function readUrl(u){setMsg('ok','Fetching '+u+'…');try{const r=await fetch(u);if(!r.ok)throw Error('HTTP '+r.status);const t=await r.text();ingest(/\.json(\?|$)/i.test(u)?jsonTable(JSON.parse(t)):C.parseCSV(t),u.split('/').pop().split('?')[0]||'url dataset',u)}catch(e){setMsg('err','Could not fetch the URL ('+e.message+'). This is usually CORS or authentication blocking a browser request. Download the file and upload it instead, or use a server-side import.')}}
+function download(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click()}
+document.addEventListener('change',e=>{const t=e.target,d=t.dataset;if(t.id=='theme'){pref=t.value;try{localStorage.setItem('wx-theme',pref)}catch(x){}return applyTheme()}if(t.id=='file'&&t.files[0])return readFile(t.files[0]);
+ if(d.map!==undefined){S.map[d.map]=+t.value;S.units=C.guessUnits(S.table.headers,S.map)&&{...C.guessUnits(S.table.headers,S.map),...S.units};return}
+ if(d.unit){S.units[d.unit]=t.value;return}if(d.f){S.f[d.f]=+t.value||(d.f=='ap'?'':+t.value);if(d.f=='ap')S.f.ap=t.value;S.page=0;S.f.sector=-1;return render()}
+ if(d.rw){S.rw[d.rw]=d.rw=='use'?t.value:+t.value;return render()}if(d.th){S.th[d.th]=+t.value;return render()}});
+document.addEventListener('click',e=>{const t=e.target.closest('[data-go],[data-tab],[data-sector],[data-row],[data-pg],[data-clear],#apply,#loadUrl,#expCsv,#expJson');if(!t)return;const d=t.dataset;
+ if(d.go!==undefined){S.qa=false;return render()}if(d.tab){S.tab=d.tab;S.qa=false;return render()}if(d.sector!==undefined){S.f.sector=+d.sector;S.tab='data';S.page=0;return render()}if(d.row!==undefined){S.sel=+d.row;return render()}
+ if(d.pg){S.page=Math.max(0,S.page+ +d.pg);return render()}if(d.clear!==undefined){S.f.sector=-1;return render()}if(t.id=='loadUrl'){const u=$('#url').value.trim();return u?readUrl(u):setMsg('err','Enter a URL first.')}
+ if(t.id=='apply'){if(S.map.time<0)return setMsg('err','A timestamp column is required.');const {recs,meta}=C.normalise(S.table,S.map,S.units);if(!recs.length)return setMsg('err','No rows had a readable timestamp — check the mapping.');S.recs=recs;S.meta=meta;S.f={ap:aps()[0][0],y0:0,y1:9999,mo:0,hr:-1,sector:-1};S.tab='overview';S.qa=true;S.msg=null;return render()}
+ if(t.id=='expCsv'){const Rs=R();return download('filtered_observations.csv',C.toCSV(Rs),'text/csv')}
+ if(t.id=='expJson'){const Rs=R();return download('summary.json',JSON.stringify({source:S.src,filters:S.f,thresholds:S.th,runwayHeading:hdg(),records:Rs.length,missing:C.missing(Rs),transformations:S.meta.conversions,note:'Historical analytics only; not operational clearance.'},null,2),'application/json')}});
+document.addEventListener('keydown',e=>{if(e.key=='Enter'){const t=e.target.closest('[data-row],[data-sector]');if(t)t.dispatchEvent(new MouseEvent('click',{bubbles:true}))}});
+let pref='system';try{pref=localStorage.getItem('wx-theme')||'system'}catch(e){}
+const applyTheme=()=>{document.documentElement.dataset.theme=pref=='dark'||(pref=='system'&&matchMedia('(prefers-color-scheme:dark)').matches)?'dark':'light'};matchMedia('(prefers-color-scheme:dark)').addEventListener('change',applyTheme);$('#hm').innerHTML=mark(false);$('#theme').value=pref;
+const net=()=>{const el=$('#net');if(el)el.textContent=(navigator.onLine?'Online':'Offline')+(S.off?' · ready to work offline':location.protocol.startsWith('http')?' · preparing offline mode…':' · offline mode needs the hosted https address')};
+addEventListener('online',net);addEventListener('offline',net);
+if('serviceWorker' in navigator&&location.protocol.startsWith('http')){navigator.serviceWorker.register('sw.js').catch(()=>{});navigator.serviceWorker.ready.then(()=>{S.off=true;net()})}
+render();net();
+</script></body></html>
